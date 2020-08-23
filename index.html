@@ -885,7 +885,7 @@
 												</div>
 												<h5 class="card-title mb-0">Active Users</h5>
 										</div>
-									<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+									<div id="graph" style="height: 300px; width: 100%;"></div>
 									
 								</div>
 							</div>
@@ -981,12 +981,31 @@
 									<div class="card-header">
 										<div class="card-actions float-right">
 										</div>
+										<h5 class="card-title mb-0">Appointment conversion rate</h5>
+									</div>
+								
+						
+								<div class="card-body d-flex w-100">
+									<div id="paleto" style="height: 300px; width: 100%;"></div>
+								</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					<div class = "row">
+						<div class="col-xl-6 col-xxl-7">
+							<div class="card flex-fill w-100">
+								<div class="card-body py-3">
+									<div class="card-header">
+										<div class="card-actions float-right">
+										</div>
 										<h5 class="card-title mb-0">Total Revenue</h5>
 									</div>
 								
 						
 								<div class="card-body d-flex w-100">
-									<div id="chart1" style="height: 300px; width: 100%;"></div>
+									<div id="pie" style="height: 300px; width: 100%;"></div>
 								</div>
 								</div>
 							</div>
@@ -1019,7 +1038,7 @@
 	<script>
 		window.onload = function () {
 		
-		var chart = new CanvasJS.Chart("chartContainer", {
+		var chart = new CanvasJS.Chart("graph", {
 			animationEnabled: true,
 			theme: "light2",
 			title:{
@@ -1052,7 +1071,7 @@
 		});
 		chart.render();
 
-		var chart1 = new CanvasJS.Chart("chart1", {
+		var chart1 = new CanvasJS.Chart("pie", {
 			animationEnabled: true,
 			title:{
 				// text: "",
@@ -1076,7 +1095,77 @@
 			}]
 		});
 		chart1.render();
+		var chart2 = new CanvasJS.Chart("paleto", {
+			title:{
+				text: ""
+			},
+			axisY: {
+				title: "No of appointment",
+				lineColor: "#4F81BC",
+				tickColor: "#4F81BC",
+				labelFontColor: "#4F81BC"
+			},
+			axisY2: {
+				title: "Percentage",
+				suffix: "%",
+				lineColor: "#C0504E",
+				tickColor: "#C0504E",
+				labelFontColor: "#C0504E"
+			},
+			data: [{
+				type: "column",
+				dataPoints: [
+					{ label: "home care", y: 2, color:"#d9534f" },
+					{ label: "virtual-care-gp", y: 141, color:"#5bc0de"},
+					{ label: "virtual-care-sp", y: 18, color:"#f0ad4e"},
+					{ label: "sars-cov-2", y: 40, color:"#5cb85c"}
+				]
+			}]
+		});
+		chart2.render();
+		createPareto();	
+
+		function createPareto(){
+			var dps = [];
+			var yValue, yTotal = 0, yPercent = 0, w =0;
+
+			for(var i = 0; i < chart2.data[0].dataPoints.length; i++){
+				yTotal += chart2.data[0].dataPoints[i].y;
+				}
+
+			
+				
+
+			// for(var i = 0; i < chart2.data[0].dataPoints.length; i++){
+			// 	yValue = chart2.data[0].dataPoints[i].y;
+			// 	yPercent += (yValue / yTotal * 100);
+			// 	dps.push({label: chart2.data[0].dataPoints[i].label, y: yPercent});
+			// }
+
+			var n = chart2.data[0].dataPoints //This represents the number of booked appointments
+			var m = [0, 13, 13, 33] //This represents the the number of confirmed appointments
+			data = []
+			n.forEach((bookedApp, index) => {
+				const confirmedApp = m[index];
+				data.push(confirmedApp)
+				yValue = bookedApp.y;
+				// console.log(confirmedApp);
+				// console.log(yValue);
+				yPercent = ( confirmedApp / yValue * 100);
+				// console.log(yPercent);
+
+				dps.push({label: bookedApp.label, y: yPercent, data : confirmedApp});
+				// console.log(yPercent);
+				});
+				console.log(data);
+			
+			chart2.addTo("data",{type:"line", yValueFormatString: "0.##\"%\"", indexLabel: "{y}({data})", dataPoints: dps});
+			chart2.data[1].set("axisYType", "secondary", false);
+			chart2.axisY[0].set("maximum", yTotal);
+			chart2.axisY2[0].set("maximum", 100);
+		}
 		
 		
 		}
+
 		</script>
